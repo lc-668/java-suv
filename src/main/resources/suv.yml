@@ -1,0 +1,13 @@
+suv:
+  logDir: "D:/temp/java-suv-logs"
+  program:
+    frp:
+      direction: "D:/code_tool/open_source_tool/frp_0.62.1_windows_amd64"
+      # 一定不能忘记加.exe
+      command: "cmd.exe /c frpc.exe -c frpc.toml"
+      autostart: false
+    openWebUi:
+      direction: "D:/code/open_code/open-webui"
+      # command: "frpc.exe -c frpc.toml"
+      command: "cmd.exe /c startOwu.bat"
+      autostart: false

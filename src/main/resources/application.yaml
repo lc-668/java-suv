@@ -1,0 +1,8 @@
+server:
+  port: 9006
+#spring:
+#  profiles:
+#    active: suv
+
+# 配置supervisor的路径,如果不填写。默认从身边找
+# suv.config.path: "D:/smallTool/code_build/java-suv/suv.yml"

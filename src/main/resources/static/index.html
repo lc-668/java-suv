@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钛兴科技-进程守护</title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="/plugin/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+    <script src="/plugin/jquery/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <script src="/plugin/bootstrap/bootstrap.min.js"></script>
+    <!-- 可以添加CSS样式文件 -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加 favicon -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- axios -->
+    <!--<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.7/vue.js"></script>-->
+    <script src="/plugin/js/axios.min.js"></script>
+    <script src="/plugin/js/vue.js"></script>
+</head>
+<body>
+<main id="app">
+    <!-- 主体内容区域 -->
+    <h1 class="text-center text-success">JAVA-Supervisor</h1>
+    <div class="container">
+        <h2>Programs</h2>
+        <div class="row">
+            <div class="col-12">
+                <input type="button" class="btn btn-primary float-right mr-1" value="Shutdown"
+                       onclick="shutdown_supervisor();">
+                <input type="button" class="btn btn-primary float-right mr-1" value="Reload"
+                       onclick="reload_supervisor();">
+                <input type="button" class="btn btn-primary float-right mr-1" value="Stop Select"
+                       onclick="stop_select();">
+                <input type="button" class="btn btn-primary float-right mr-1" value="Start Select"
+                       onclick="start_select();">
+            </div>
+        </div>
+        <div class="table-responsive mt-3">
+            <div class="bootstrap-table">
+                <div class="fixed-table-toolbar"></div>
+                <div class="fixed-table-container" style="padding-bottom: 0px;">
+                    <div class="fixed-table-header" style="display: none;">
+                        <table></table>
+                    </div>
+                    <div class="fixed-table-body">
+                        <div class="fixed-table-loading" style="top: 41.6667px;">Loading, please wait...</div>
+                        <table id="programs" data-toggle="table" data-click-to-select="true" class="table table-hover"
+                               style="margin-top: 0px;">
+                            <thead>
+                            <tr>
+                                <th class="bs-checkbox " style="width: 36px; " data-field="id">
+                                    <div class="th-inner "><input name="btSelectAll" type="checkbox"></div>
+                                    <div class="fht-cell"></div>
+                                </th>
+                                <th style="" data-field="name">
+                                    <div class="th-inner ">Program</div>
+                                    <div class="fht-cell"></div>
+                                </th>
+                                <th style="" data-field="statename">
+                                    <div class="th-inner ">State</div>
+                                    <div class="fht-cell"></div>
+                                </th>
+                                <th style="" data-field="description">
+                                    <div class="th-inner ">Description</div>
+                                    <div class="fht-cell"></div>
+                                </th>
+                                <th style="" data-field="action">
+                                    <div class="th-inner ">Action</div>
+                                    <div class="fht-cell"></div>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr data-index="0" v-for="(item,index) in programList">
+                                <td class="bs-checkbox "><input data-index="0" name="btSelectItem" type="checkbox"></td>
+                                <td style="">{{item.name}}</td>
+                                <td style="">
+                                    <div v-if="item.isRun==1" style="background-color:green;">{{item.state}}</div>
+                                    <div v-if="item.isRun==0" style="background-color:red;">{{item.state}}</div>
+                                </td>
+                                <td style="">pid 11012, uptime 0:57:08</td>
+                                <td style="">
+                                    <button type="button" class="btn btn-primary mr-1"
+                                            @click="startProgram(item.name);">Start
+                                    </button>
+                                    <button type="button" class="btn btn-primary"
+                                            @click="stopProgram(item.name);">
+                                        Stop
+                                    </button>
+                                    <!-- disabled="" -->
+                                    <button  type="button" class="btn btn-primary"
+                                            @click="hrefTail(item.name);">
+                                        tail
+                                    </button>
+                                </td>
+                            </tr>
+                            <!--                        <tr data-index="1">-->
+                            <!--                            <td class="bs-checkbox "><input data-index="1" name="btSelectItem" type="checkbox"></td>-->
+                            <!--                            <td style="">python_web</td>-->
+                            <!--                            <td style="">-->
+                            <!--                                <div style="background-color:red;">Stopped</div>-->
+                            <!--                            </td>-->
+                            <!--                            <td style=""></td>-->
+                            <!--                            <td style="">-->
+                            <!--                                <button type="button" class="btn btn-primary mr-1"-->
+                            <!--                                        onclick="startProgram('python_web');">Start-->
+                            <!--                                </button>-->
+                            <!--                                <button type="button" disabled="" class="btn btn-primary"-->
+                            <!--                                        onclick="stopProgram('python_web');">Stop-->
+                            <!--                                </button>-->
+                            <!--                            </td>-->
+                            <!--                        </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="fixed-table-footer" style="display: none;">
+                        <table>
+                            <tbody>
+                            <tr></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="fixed-table-pagination" style="display: none;"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="my-modal-title">Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="my-modal-message">Do you want to save changes you made to document before closing?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="my-modal-cancel-btn">Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="my-modal-confirm-btn">
+                        Shutdown
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+<script>
+    async function reqPost(url, data) {
+        let resp = await axios.post(url, data);
+        let respData = resp.data;
+        if (respData.code != 200) {
+            alert(respData.msg)
+            throw new Error(respData.msg)
+        }
+        return respData.data;
+    }
+
+    const app = new Vue({
+        el: '#app', // Vue 实例挂载的元素
+        data() {
+            return {
+                message: 'Hello Vue!',
+                programList: [],
+                fileLog: null,
+                isRead: false
+            }
+        },
+        async created() {
+            await this.getData()
+            let env = this
+            setInterval(async () => {
+                await env.getData()
+            }, 5000)
+        },
+        methods: {
+            async getData() {
+                let url = '/suv/list'
+                const response = await axios.get(url);
+                this.programList = response.data.data
+                console.log(this.programList)
+            },
+            async startProgram(name) {
+                await reqPost("/suv/startProgram?program=" + name)
+                await this.getData()
+            },
+            async stopProgram(name) {
+                await reqPost("/suv/stopProgram?program=" + name)
+                await this.getData()
+            },
+            async hrefTail(name) {
+                let url="/suv/tail//" + name;
+                window.open(url)
+            },
+        }
+    });
+</script>
+</html>
